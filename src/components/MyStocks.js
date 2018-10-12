@@ -1,123 +1,86 @@
 import React, { Component } from 'react';
 import axios from 'axios'
+import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
 
 
-
-let typesSelected = []
 let savedStocks = []
 class MyStocks extends Component {
 
   constructor(props){
     super(props);
     this.state = {
-      quote: false,
-      news: false,
-      chart: false
+      types : ['quote']
     }
 
-    this.handleInputChange = this.handleInputChange.bind(this);
-
-
+    this.handleLoadData = this.handleLoadData.bind(this);
+    this.handleTypeChange = this.handleTypeChange.bind(this);
 
     for (var i = 0; i < sessionStorage.length; i++){
-      // console.log(sessionStorage.getItem(sessionStorage.key(i)));
       savedStocks.push(
         sessionStorage.getItem(sessionStorage.key(i))
       )
     }
-
-
-    // axios.get(`https://api.iextrading.com/1.0/stock/market/batch?symbols=${savedStocks}&types=${typesSelected}&range=1m&last=5`)
-    // .then((response) => {
-    //   console.log(response.data)
-    //   for (var i = 0; i < savedStocks.length; i++){
-    //     console.log(sessionStorage.getItem(sessionStorage.key(i)), response.data[savedStocks[i]].quote.change)
-    //   }
-    //
-    //
-    //   this.setState({
-    //
-    //   })
-    //   // sessionStorage.setItem("List", list)
-    //
-    //
-    // }).catch((error)=>{
-    //   alert('Error getting data here')
-    // })
-
-
   }
 
-  handleInputChange(event) {
+  componentDidMount() {
+      this.handleLoadData()
+  }
 
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-    console.log('value', value);
-    console.log('name', name);
-    this.setState({
-      [name]: value
-    });
-    localStorage.setItem(name, value)
-    if (value === true){
-      console.log('hello');
-      typesSelected.push(
-        name
-      )
-    } else {
-      typesSelected.shift(
-        name
-      )
-    }
-    console.log(typesSelected);
-    console.log(savedStocks);
-    console.log(sessionStorage.getItem(name));
-    if (typesSelected.length > 0 && savedStocks.length > 0){
-      axios.get(`https://api.iextrading.com/1.0/stock/market/batch?symbols=${savedStocks}&types=${typesSelected}&range=1m&last=5`)
+  handleTypeChange(setType) {
+    setTimeout(() => {
+      this.setState({
+        types: setType
+      });
+      this.handleLoadData()
+    }, 100);
+  }
+
+
+
+  handleLoadData(event){
+    console.log(this.state.types);
+    if (this.state.types.length > 0 && savedStocks.length > 0){
+      axios.get(`https://api.iextrading.com/1.0/stock/market/batch?symbols=${savedStocks}&types=${this.state.types}&range=1m&last=5`)
       .then((response) => {
         console.log(response.data)
+        console.log(this.state.types)
         for (var i = 0; i < savedStocks.length; i++){
-          console.log(sessionStorage.getItem(sessionStorage.key(i)), response.data[savedStocks[i]].quote.close)
+          if (this.state.types === 'quote'){
+            console.log(sessionStorage.getItem(sessionStorage.key(i)), response.data[savedStocks[i]].quote.latestPrice)
+          }
         }
-
-
-        this.setState({
-
-        })
-        // sessionStorage.setItem("List", list)
-
-
       }).catch((error)=>{
         alert('Error getting data here')
       })
     }
-
   }
+
 
   render() {
 
 
     return (
       <div className="App">
-        <form>
-          <label>
-            <input name="quote" type="checkbox" onChange={this.handleInputChange} checked={this.state.quote} />
-            Quotes
-          </label>
-          <label>
-            <input name="news" type="checkbox" onChange={this.handleInputChange} checked={this.state.news} />
-            News
-          </label>
-          <label>
-            <input name="chart" type="checkbox" onChange={this.handleInputChange} checked={this.state.chart} />
-            Charts
-          </label>
-        </form>
+        <CheckboxGroup
+          checkboxDepth={2}
+          name="types"
+          value={this.state.types}
+          onChange={this.handleTypeChange}>
+
+          <label><Checkbox value="quote"/> Quote</label>
+          <label><Checkbox value="news"/> News</label>
+          <label><Checkbox value="chart"/> Chart</label>
+        </CheckboxGroup>
 
 
       </div>
     );
   }
-}
 
+
+
+
+
+
+}
 export default MyStocks;
