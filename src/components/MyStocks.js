@@ -72,7 +72,7 @@ class MyStocks extends Component {
     console.log(typesSelected);
     console.log(savedStocks);
     console.log(sessionStorage.getItem(name));
-    if (typesSelected.length > 0){
+    if (typesSelected.length > 0 && savedStocks.length > 0){
       axios.get(`https://api.iextrading.com/1.0/stock/market/batch?symbols=${savedStocks}&types=${typesSelected}&range=1m&last=5`)
       .then((response) => {
         console.log(response.data)
