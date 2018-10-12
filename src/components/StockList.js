@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // import TextInput from 'react-autocomplete-input'
-import 'react-autocomplete-input/dist/bundle.css';
+// import 'react-autocomplete-input/dist/bundle.css';
 import Autocomplete from "./Autocomplete";
 import MyStocks from "./MyStocks";
 
