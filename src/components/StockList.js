@@ -11,7 +11,7 @@ import axios from 'axios'
 let list = []
 let ownedStockNames = []
 let ownedStockSymbols = []
-let ownedStockSelection = []
+// let ownedStockSelection = []
 
 
 class StockList extends Component {
@@ -69,18 +69,18 @@ class StockList extends Component {
     // console.log(sessionStorage);
 
 
-    if (sessionStorage.length > 0) {
-      for (var n = 0; n < sessionStorage.length; n++){
-        if (sessionStorage.getItem(sessionStorage.key(n)) === "undefined"){
-          sessionStorage.removeItem(sessionStorage.key(n))
-          console.log('here')
-        }
-        ownedStockSelection.push(
-          <option key={n} value={sessionStorage.getItem(sessionStorage.key(n))}>{sessionStorage.key(n)} ({sessionStorage.getItem(sessionStorage.key(n))})</option>
-        )
-
-      }
-    }
+    // if (sessionStorage.length > 0) {
+    //   for (var n = 0; n < sessionStorage.length; n++){
+    //     if (sessionStorage.getItem(sessionStorage.key(n)) === "undefined"){
+    //       sessionStorage.removeItem(sessionStorage.key(n))
+    //       console.log('here')
+    //     }
+    //     ownedStockSelection.push(
+    //       <option key={n} value={sessionStorage.getItem(sessionStorage.key(n))}>{sessionStorage.key(n)} ({sessionStorage.getItem(sessionStorage.key(n))})</option>
+    //     )
+    //
+    //   }
+    // }
 
     return (
       <div className="App">
@@ -89,7 +89,7 @@ class StockList extends Component {
         <Autocomplete
           suggestions={this.state.options}
         />
-        <form >
+        {/* <form >
           <label>
             <select>
               <option value="allStocks">All Stocks</option>
@@ -97,8 +97,8 @@ class StockList extends Component {
 
             </select>
           </label>
-        </form><br/>
-        {ownedStockSelection}
+        </form><br/> */}
+        {/* {ownedStockSelection} */}
         <MyStocks />
       </div>
     );
