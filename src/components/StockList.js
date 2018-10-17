@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // import TextInput from 'react-autocomplete-input'
 // import 'react-autocomplete-input/dist/bundle.css';
 import Autocomplete from "./Autocomplete";
-import MyStocks from "./MyStocks";
+import Quotes from "./Quotes";
 
 import axios from 'axios'
 
@@ -99,7 +99,7 @@ class StockList extends Component {
           </label>
         </form><br/> */}
         {/* {ownedStockSelection} */}
-        <MyStocks />
+        <Quotes />
       </div>
     );
   }

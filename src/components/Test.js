@@ -21,11 +21,11 @@ class MyStocks extends Component {
     // setInterval(this.handleLoadData, 3000);
     // this.interval = setInterval((event) => this.setState({ time: '' }), 5000);
   }
-  componentWillUnmount() {
-    clearTimeout(this.handleLoadData);
-  }
+  // componentWillUnmount() {
+  //   clearTimeout(this.handleLoadData);
+  // }
 
-  handleLoadData(event){
+  handleLoadData(){
 
     setTimeout(() => {
       count++
@@ -41,7 +41,7 @@ class MyStocks extends Component {
         }).catch((error)=>{
           alert('Error getting data here')
         })
-      }, 1000);
+      }, 3000);
     }
 
     // handleDataLoopStart(){

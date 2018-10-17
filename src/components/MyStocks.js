@@ -22,7 +22,8 @@ class MyStocks extends Component {
     this.state = {
       types : '',
       quoteSelections: [],
-      isSelected: true
+      isSelected: true,
+      currentPrices: []
 
     }
 
@@ -88,6 +89,8 @@ class MyStocks extends Component {
       .then((response) => {
         console.log(response.data)
         console.log(this.state.types)
+        console.log(this.state.currentPrices);
+
         testArray.shift();
         for (var i = 0; i < savedStocks.length; i++){
           if (this.state.types === 'quote'){
@@ -97,6 +100,10 @@ class MyStocks extends Component {
               (sessionStorage.getItem(sessionStorage.key(i)), response.data[savedStocks[i]].quote.latestPrice)
             )
             console.log(testArray);
+            this.setState({
+              currentPrices: response.data[savedStocks[i]].quote.latestPrice
+            })
+
           }
         }
       }).catch((error)=>{
@@ -115,129 +122,128 @@ class MyStocks extends Component {
 
   render() {
 
-    //
-    // let stockList =[]
-    // let quoteOptions = []
-    // let allStocks = []
-    // let chartTimeFrame = []
-    // let newsData = []
-    // let quoteHeaders = []
-    // let latestPricePosted = []
-    //
-    // if (sessionStorage.length > 0) {
-    //   for (var n = 0; n < sessionStorage.length; n++){
-    //     if (sessionStorage.getItem(sessionStorage.key(n)) === "undefined"){
-    //       sessionStorage.removeItem(sessionStorage.key(n))
-    //       console.log('here')
-    //     }
-    //     ownedStockSelection.push(
-    //       <option key={n} value={sessionStorage.getItem(sessionStorage.key(n))}>{sessionStorage.key(n)} ({sessionStorage.getItem(sessionStorage.key(n))})</option>
-    //     )
-    //
-    //   }
-    // }
-    //
-    //
-    //
-    //
-    //
-    // if (savedStocks.length >= 0){
-    //   for (var j = 0; j < savedStocks.length; j++){
-    //     stockList.push(
-    //       <tbody key={j}>
-    //         <tr>
-    //           <td>{savedStocks[j]}</td>
-    //           <td>{testArray[j]}</td>
-    //         </tr>
-    //       </tbody>
-    //     )
-    //   }
-    // }
-    //
-    //
-    // if (this.state.types === 'quote'){
-    //   this.handleDataLoopStart()
-    //
-    //   allStocks.push(
-    //     <option key={0} value="allStocks">All Stocks</option>
-    //   )
-    //   quoteOptions.push(
-    //     <CheckboxGroup key={0}
-    //       checkboxDepth={3}
-    //       name="quoteSelections"
-    //       value={this.state.quoteSelections}
-    //       onChange={this.handleQuoteSelections}
-    //       >
-    //
-    //       <label><Checkbox checked='true' value="latestPrice"/> Latest Price</label>
-    //       <label><Checkbox value="latestTime"/> Latest Time</label>
-    //       <label><Checkbox value="high"/> High</label>
-    //       <label><Checkbox value="low"/> Low</label>
-    //       <label><Checkbox value="previousClose"/> Previous Close</label>
-    //       <label><Checkbox value="change"/> Change from Previous Close</label>
-    //       <label><Checkbox value="open"/> Open</label>
-    //       <label><Checkbox value="primaryExchange"/> Primary Exchange</label>
-    //     </CheckboxGroup>
-    //   )
-    //   // for (var r = 0; r < this.state.quoteSelections.length; r++){
-    //   //   if (this.state.quoteSelections === 'latestPrice'){
-    //   //     quoteHeaders.push(
-    //   //       <th key={0}>
-    //   //         Latest Price
-    //   //       </th>
-    //   //     )
-    //   //   }
-    //   // }
-    //   for (var p = 0; p < testArray.length; p++){
-    //     console.log(sessionStorage.getItem(sessionStorage.key(p)));
-    //     console.log(testArray);
-    //     latestPricePosted.push(
-    //
-    //       <tbody key={p}>
-    //         <tr>
-    //           <td>{testArray[p]}</td>
-    //         </tr>
-    //       </tbody>
-    //     )
-    //   }
-    // }
-    //
-    //
-    //
-    // if (this.state.types === 'chart'){
-    //   allStocks.shift()
-    //   // this.handleDataLoopStop()
-    //   chartTimeFrame.push(
-    //     <form key={0}>
-    //       <label>
-    //         <select>
-    //           <option value="5y">5 Years</option>
-    //           <option value="2y">2 Years</option>
-    //           <option value="1y">1 Year</option>
-    //           <option value="ytd">Year To Date</option>
-    //           <option value="6m">6 Months</option>
-    //           <option value="3m">3 Months</option>
-    //           <option value="1m">1 Month</option>
-    //           <option value="1d">1 day</option>
-    //           {/* <option value="date">Custom Date</option> */}
-    //
-    //         </select>
-    //       </label>
-    //     </form>
-    //   )
-    //
-    // } else
-    //
-    // if (this.state.types === 'news'){
-    //   clearInterval()
-    //   allStocks.shift()
-    //     newsData.push(
-    //       <News key={0}/>
-    //     )
-    // }
+    let stockList =[]
+    let quoteOptions = []
+    let allStocks = []
+    let chartTimeFrame = []
+    let newsData = []
+    let quoteHeaders = []
+    let latestPricePosted = []
+
+    if (sessionStorage.length > 0) {
+      for (var n = 0; n < sessionStorage.length; n++){
+        if (sessionStorage.getItem(sessionStorage.key(n)) === "undefined"){
+          sessionStorage.removeItem(sessionStorage.key(n))
+          console.log('here')
+        }
+        ownedStockSelection.push(
+          <option key={n} value={sessionStorage.getItem(sessionStorage.key(n))}>{sessionStorage.key(n)} ({sessionStorage.getItem(sessionStorage.key(n))})</option>
+        )
+
+      }
+    }
+
+
+
+
+
+    if (savedStocks.length >= 0){
+      for (var j = 0; j < savedStocks.length; j++){
+        stockList.push(
+          <tbody key={j}>
+            <tr>
+              <td>{savedStocks[j]}</td>
+              <td>{testArray[j]}</td>
+            </tr>
+          </tbody>
+        )
+      }
+    }
+
+
+    if (this.state.types === 'quote'){
+      this.handleDataLoopStart()
+
+      allStocks.push(
+        <option key={0} value="allStocks">All Stocks</option>
+      )
+      quoteOptions.push(
+        <CheckboxGroup key={0}
+          checkboxDepth={3}
+          name="quoteSelections"
+          value={this.state.quoteSelections}
+          onChange={this.handleQuoteSelections}
+          >
+
+          <label><Checkbox checked='true' value="latestPrice"/> Latest Price</label>
+          <label><Checkbox value="latestTime"/> Latest Time</label>
+          <label><Checkbox value="high"/> High</label>
+          <label><Checkbox value="low"/> Low</label>
+          <label><Checkbox value="previousClose"/> Previous Close</label>
+          <label><Checkbox value="change"/> Change from Previous Close</label>
+          <label><Checkbox value="open"/> Open</label>
+          <label><Checkbox value="primaryExchange"/> Primary Exchange</label>
+        </CheckboxGroup>
+      )
+      // for (var r = 0; r < this.state.quoteSelections.length; r++){
+      //   if (this.state.quoteSelections === 'latestPrice'){
+      //     quoteHeaders.push(
+      //       <th key={0}>
+      //         Latest Price
+      //       </th>
+      //     )
+      //   }
+      // }
+      for (var p = 0; p < testArray.length; p++){
+        console.log(sessionStorage.getItem(sessionStorage.key(p)));
+        console.log(testArray);
+        latestPricePosted.push(
+
+          <tbody key={p}>
+            <tr>
+              <td>{testArray[p]}</td>
+            </tr>
+          </tbody>
+        )
+      }
+    }
+
+
+
+    if (this.state.types === 'chart'){
+      allStocks.shift()
+      // this.handleDataLoopStop()
+      chartTimeFrame.push(
+        <form key={0}>
+          <label>
+            <select>
+              <option value="5y">5 Years</option>
+              <option value="2y">2 Years</option>
+              <option value="1y">1 Year</option>
+              <option value="ytd">Year To Date</option>
+              <option value="6m">6 Months</option>
+              <option value="3m">3 Months</option>
+              <option value="1m">1 Month</option>
+              <option value="1d">1 day</option>
+              {/* <option value="date">Custom Date</option> */}
+
+            </select>
+          </label>
+        </form>
+      )
+
+    } else
+
+    if (this.state.types === 'news'){
+      clearInterval()
+      allStocks.shift()
+        newsData.push(
+          <News key={0}/>
+        )
+    }
     return (
       <div className="App">
-        {/* <form >
+        <form >
           <label>
             <select>
               {allStocks}
@@ -271,8 +277,8 @@ class MyStocks extends Component {
 
         </table>
         {count}
-        <h1>{testArray}</h1> */}
-        <Test />
+        <h1>{testArray}</h1>
+        {/* <Test /> */}
       </div>
     );
   }
@@ -284,3 +290,19 @@ class MyStocks extends Component {
 
 }
 export default MyStocks;
+
+
+
+
+tableCompanyName: true,
+tableSymbol: true,
+tableLatestPrice: true,
+tableLatestTime: true,
+tableHigh: true,
+tableLow: true,
+tableWeek52High: true,
+tableWeek52Low: true,
+tableOpen: true,
+tablePreviousClose: true,
+tableChange: true,
+tableChangePercent: true
