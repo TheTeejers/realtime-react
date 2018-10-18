@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 // import axios from 'axios'
+import { app, facebookProvider, firebase } from './Firebase.js'
 
-
+let setStocks = []
 
 class Autocomplete extends Component {
   static propTypes = {
@@ -17,6 +18,8 @@ class Autocomplete extends Component {
     super(props);
 
     this.state = {
+      userID: '',
+      userEmail: '',
       // The active selection's index
       activeSuggestion: 0,
       // The suggestions that match the user's input
@@ -28,36 +31,54 @@ class Autocomplete extends Component {
       suggestions: []
     };
 
-    // axios.get('https://api.iextrading.com/1.0/ref-data/symbols')
-    // .then((response) => {
-    //   let list = []
-    //   for (var i = 0; i < response.data.length; i++){
-    //     list.push(
-    //       response.data[i].name + ' (' + response.data[i].symbol + ')'
-    //     )
-    //   }
-    //   this.setState({
-    //     filteredSuggestions: list
-    //   })
-    //   sessionStorage.setItem("List", list)
-    //   // console.log(sessionStorage.getItem("List"))
-    //   console.log(this.state.filteredSuggestions.length)
-    //
-    // }).catch((error)=>{
-    //   alert('Error getting data here')
-    // })
+
 
 
   }
+  componentDidMount() {
+    this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
+      if (user){
+        console.log('logged in', user);
+        this.setState({
+          userID: user.uid,
+          userEmail: user.email
+        })
+      // } else {
+      //   this.setState({
+      //     userID: '',
+      //     userEmail: ''
+      //   })
+      }
+    })
+  }
+
   handleStockSet = e =>{
+
+
     let symbol = this.refs.stockSearched.value.split('---')
     sessionStorage.setItem(symbol[0], symbol[1])
     console.log(sessionStorage)
+    console.log(symbol[1])
+    setStocks.push(Object.values(sessionStorage))
 
-    if(this.refs.stockSearched.value !==''){
-        this.refs.stockSearched.value= ""
+    // for (var x = 0; )
+    console.log(Object.values(sessionStorage))
+    console.log(this.state.userID);
+    console.log(setStocks);
+    if (this.state.userID !== ''){
+      var newStockKey = firebase.database().ref().push().key
+      var updates = {};
+      updates['users/' + this.state.userID + '/stocks/' + newStockKey] = symbol[1];
+
+      console.log(firebase.database().ref().update(updates));
+     }
+
+    if(this.refs.stockSearched.value !== ''){
+        this.refs.stockSearched.value = ""
       }
-    window.location.reload()
+    // window.location.reload()
+    console.log(sessionStorage)
+
   }
 
   // Event fired when the input value is changed
@@ -124,6 +145,8 @@ class Autocomplete extends Component {
   };
 
   render() {
+    // console.log(Object.values(sessionStorage))
+
       const {
       onChange,
       onClick,

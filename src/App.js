@@ -53,7 +53,7 @@ class App extends Component {
       <div className="App">
         <Header authenticated={this.state.authenticated} />
 
-        <Routes />
+        <Routes authenticated={this.state.authenticated}/>
         <StockList />
 
       </div>

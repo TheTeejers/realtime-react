@@ -18,10 +18,15 @@ class LogOut extends Component {
 
   componentWillMount(){
     app.auth().signOut().then((user) => {
+
+      sessionStorage.clear()
+
+
       this.setState({
         redirect: true
       })
     })
+
   }
 
 

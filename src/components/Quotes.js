@@ -6,16 +6,27 @@ import Checkbox from 'rc-checkbox';
 // import News from './News.js';
 // import Test from './Test.js';
 // import News from './News';
+// import { Link } from 'react-router-dom'
+import { app, facebookProvider, firebase } from './Firebase.js'
+
+
+
 import '../App.css';
 
 
+
+
 let savedStocks = []
+
 // sessionStorage.clear()
 class Quotes extends Component {
 
   constructor(props){
     super(props);
     this.state = {
+      authenticated: false,
+      userID: '',
+      userEmail: '',
       stockInfo: {
         stockCompanyName: [],
         stockSymbol: [],
@@ -31,42 +42,84 @@ class Quotes extends Component {
         stockChangePercent: []
       },
 
-        tableCompanyName: true,
-        tableSymbol: true,
-        tableLatestPrice: true,
-        tableLatestTime: true,
-        tableHigh: true,
-        tableLow: true,
-        tableWeek52High: true,
-        tableWeek52Low: true,
-        tableOpen: true,
-        tablePreviousClose: true,
-        tableChange: true,
-        tableChangePercent: true,
-        lowNumber: true,
+      tableCompanyName: true,
+      tableSymbol: true,
+      tableLatestPrice: true,
+      tableLatestTime: true,
+      tableHigh: true,
+      tableLow: true,
+      tableWeek52High: true,
+      tableWeek52Low: true,
+      tableOpen: true,
+      tablePreviousClose: true,
+      tableChange: true,
+      tableChangePercent: true,
+      lowNumber: true,
 
       isLoading: true,
       errors: null
     };
 
+
     this.handleLabelInfoSelect = this.handleLabelInfoSelect.bind(this);
 
-    for (var i = 0; i < sessionStorage.length; i++){
-      savedStocks.push(
-        sessionStorage.getItem(sessionStorage.key(i))
-      )
-    }
+    // console.log(this.state.userID);
+    // if (firebase.auth().currentUser !== null){
+    //   var updatedStocks = firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/stocks');
+    //   updatedStocks.on('value', function(snapshot) {
+    //     console.log('current user stocks', Object.values(snapshot.val()));
+    //     savedStocks = Object.values(snapshot.val())
+    //     console.log(savedStocks);
+    //     console.log('current user stocks', Object.values(snapshot.val()));
+    //
+    //   });
+    // }
 
+
+ console.log(savedStocks);
   }
 
 
   componentDidMount() {
-    this.getUsers();
+    this.getStockData();
+    this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
+      if (user){
+        console.log('logged in', user);
+        this.setState({
+          authenticated: true,
+          loading: false,
+          userID: user.uid,
+          userEmail: user.email
+        })
+
+        console.log(this.state.userID);
+        let userid = firebase.auth().currentUser.uid
+        console.log("try", firebase.database().ref('/users/' + userid).once('value'));
+
+      } else {
+        this.setState({
+          authenticated: false,
+          loading: false,
+          userID: '',
+          userEmail: ''
+        })
+      }
+    })
+    firebase.database().ref('users/' + firebase.auth().currentUser.uid).set({
+      stocks: {
+          placeholder: 0
+      },
+      email: firebase.auth().currentUser.email
+  });
   }
 
 
-  getUsers() {
+
+
+  getStockData() {
+    console.log(savedStocks);
     setInterval(() => {
+
       let stockCompanyNameArray = []
       let latestPriceArray = []
       let latestTimeArray = []
@@ -77,7 +130,26 @@ class Quotes extends Component {
       let openArray = []
       let previousCloseArray = []
       let changeArray = []
+
       let changePercentArray = []
+      if (this.state.userID !== ''){
+        // console.log(this.state.userID);
+        // console.log("try", firebase.auth().currentUser.uid);
+        // console.log("try", firebase.database().ref('users/' + firebase.auth().currentUser.uid));
+        // firebase.database().ref('/users/' + firebase.auth().currentUser.uid).once('value')
+        firebase.database().ref('/users/' + this.state.userID).once('value')
+        .then((snapshot) => {
+          var userStocks = (Object.values(snapshot.val().stocks));
+          console.log();
+
+          savedStocks = userStocks
+
+        });
+
+      }
+      if (savedStocks.length > 0){
+
+
 
       axios.get(`https://api.iextrading.com/1.0/stock/market/batch?symbols=${savedStocks}&types=quote`)
 
@@ -136,8 +208,7 @@ class Quotes extends Component {
               stockChangePercent: changePercentArray
             }
           });
-          // console.log(this.state.stockInfo.stockSymbol)
-          // console.log(this.state.stockInfo.stockLatestPrice)
+
         })
         .then(users => {
           this.setState({
@@ -145,7 +216,11 @@ class Quotes extends Component {
           });
         })
         .catch(error => this.setState({ error, isLoading: false }));
-      }, 2000);
+      } else {
+        console.log('none');
+      }
+    }, 2000);
+
   }
 
 
@@ -154,17 +229,71 @@ class Quotes extends Component {
       this.setState({
           [e.target.value]: e.target.checked,
       })
-    // console.log('Checkbox checked:', (e.target.checked));
-    // console.log('Checkbox name:', (e.target.value));
+
+
+    // firebase.database().ref('users/' + this.state.userID).set({
+    //
+    //    stocks: Object.values(sessionStorage)
+    //  });
+
+
+    // console.log(firebase.database().ref(this.state.userID));
+    // console.log(firebase.database().ref());
+    // console.log(this.state.userID);
+
+
   }
 
   handleRemoveStock(e){
-    sessionStorage.removeItem(sessionStorage.key(e.target.value))
+
+    let splitID = e.target.value.split(',')
+    console.log(splitID, firebase.auth().currentUser.uid);
+
+
+    // sessionStorage.removeItem(sessionStorage.key(splitID[1]))
+
+    console.log(Object.values(sessionStorage)[splitID[1]]);
+    console.log(Object.values(sessionStorage));
+
+    console.log(e.target.value);
+    firebase.database().ref('/users/' +splitID[0]).once('value')
+    .then((snapshot) => {
+      let userStocksTest = (snapshot.val().stocks);
+      var userStocks = (Object.values(snapshot.val().stocks));
+      var userStocksKeys = (Object.keys(snapshot.val().stocks));
+      console.log('delete area', userStocks);
+      for (var p = 0; p < userStocks.length; p++){
+        if (Object.values(sessionStorage)[splitID[1]] === userStocks[p]){
+          console.log('one');
+          console.log(userStocksTest);
+          console.log(userStocks[p]);
+          console.log(userStocksKeys[p]);
+
+          // firebase.database().ref('users/' + splitID[0] + '/stocks/').remove(userStocksKeys[p]);
+          sessionStorage.removeItem(sessionStorage.key(splitID[1]))
+
+           firebase.database().ref('users/' + splitID[0] + '/stocks/').update({
+
+              [userStocksKeys[p]]: null
+            });
+
+
+
+
+        }
+      }
+
+    });
+
+
   }
 
 
 
   render() {
+    // console.log(Object.values(sessionStorage));
+    // console.log(sessionStorage.key(2));
+    // console.log(this.state.userID);
 
 
     let liveStockDataPosted = []
@@ -186,8 +315,9 @@ class Quotes extends Component {
           <tbody key={j}>
             <tr>
               <td>{this.state.stockInfo.stockCompanyName[j]}</td>
-              {/* <td><button>Remove</button></td> */}
-              <td><button onClick={this.handleRemoveStock} value={j}>Remove</button></td>
+
+              <td><button onClick={this.handleRemoveStock} value={[this.state.userID,j]}>Remove</button></td>
+
               <td className={this.state.tableSymbol ? '' : 'hidden'}>{this.state.stockInfo.stockSymbol[j]}</td>
               <td className={`${this.state.tableLatestPrice ? '' : 'hidden'} ${color[0]}`}>${this.state.stockInfo.stockLatestPrice[j].toFixed(2)}</td>
               <td className={this.state.tableLatestTime ? '' : 'hidden'}>{this.state.stockInfo.stockLatestTime[j]}</td>
